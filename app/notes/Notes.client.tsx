@@ -1,0 +1,89 @@
+'use client';
+
+import css from './NotesPage.module.css';
+import { useState } from 'react';
+import { useDebouncedCallback } from 'use-debounce';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
+import { Toaster } from 'react-hot-toast';
+
+import SearchBox from '@/components/SearchBox/SearchBox';
+import Pagination from '@/components/Pagination/Pagination';
+import NoteList from '@/components/NoteList/NoteList';
+import Modal from '@/components/Modal/Modal';
+import NoteForm from '@/components/NoteForm/NoteForm';
+import NoNotesMessage from '@/components/NoNotesMessage/NoNotesMessage';
+
+import { fetchNotes } from '@/lib/api';
+import type { FetchNotesParams, FetchNotesResponse } from '@/lib/api';
+import useModalControl from '@/hooks/useModalControl';
+
+interface NotesClientProps {
+  initialParams: FetchNotesParams;
+}
+
+function NotesClient({ initialParams }: NotesClientProps) {
+  const createNoteModal = useModalControl();
+
+  const [params, setParams] = useState<FetchNotesParams>(initialParams);
+
+  const { data, isLoading, isError, isFetching } = useQuery<FetchNotesResponse, Error>({
+    queryKey: ['notes', params.search, params.sortBy, params.page],
+    queryFn: () => fetchNotes(params),
+    placeholderData: keepPreviousData,
+    staleTime: 1000 * 60 * 5,
+  });
+
+  const debounceSearch = useDebouncedCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    setParams(prev => ({ ...prev, search: event.target.value, page: 1 }));
+  }, 300);
+
+  const handlePageChange = (page: number) => {
+    setParams(prev => ({ ...prev, page }));
+  };
+
+  let content;
+
+  if (isLoading) {
+    content = <p>Loading, please wait...</p>;
+  } else if (isError) {
+    content = <p>Something went wrong.</p>;
+  } else if (data && data.notes.length === 0) {
+    content = <NoNotesMessage isSearch={params.search.length > 0} />;
+  } else if (data) {
+    content = <NoteList notes={data.notes} />;
+  }
+
+  return (
+    <div className={css.app}>
+      <Toaster />
+
+      <header className={css.toolbar}>
+        <SearchBox search={params.search} onChange={debounceSearch} />
+
+        {isFetching && <p className={css.fetchingIndicator}>Updating...</p>}
+
+        {data?.totalPages && data.totalPages > 1 && (
+          <Pagination
+            currentPage={params.page}
+            totalPages={data.totalPages}
+            onPageChange={handlePageChange}
+          />
+        )}
+
+        <button className={css.button} onClick={createNoteModal.openModal}>
+          Create note +
+        </button>
+      </header>
+
+      <div className={css.listContainer}>{content}</div>
+
+      {createNoteModal.isModalOpen && (
+        <Modal onClose={createNoteModal.closeModal}>
+          <NoteForm onClose={createNoteModal.closeModal} />
+        </Modal>
+      )}
+    </div>
+  );
+}
+
+export default NotesClient;
