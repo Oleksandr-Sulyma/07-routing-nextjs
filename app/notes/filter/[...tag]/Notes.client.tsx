@@ -27,7 +27,7 @@ function NotesClient({ initialParams }: NotesClientProps) {
   const [params, setParams] = useState<FetchNotesParams>(initialParams);
 
   const { data, isLoading, isError, isFetching } = useQuery<FetchNotesResponse, Error>({
-    queryKey: ['notes', params.search, params.sortBy, params.page],
+    queryKey: ['notes', params.search, params.sortBy, params.page, params.tag],
     queryFn: () => fetchNotes(params),
     placeholderData: keepPreviousData,
     staleTime: 1000 * 60 * 5,
