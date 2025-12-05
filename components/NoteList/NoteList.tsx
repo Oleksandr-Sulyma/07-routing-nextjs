@@ -4,10 +4,6 @@ import { deleteNote } from '@/lib/api';
 import type { Note } from '@/types/note';
 import Link from 'next/link';
 
-// type Props = {
-//   item: Note;
-// };
-
 interface NoteListProps {
   notes: Note[];
 }

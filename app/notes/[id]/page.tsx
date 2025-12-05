@@ -2,11 +2,11 @@ import { QueryClient, HydrationBoundary, dehydrate } from '@tanstack/react-query
 import { fetchNoteById } from '@/lib/api';
 import NoteDetailsClient from './NoteDetails.client';
 
-type Props = {
+type NoteDetailsProps = {
   params: Promise<{ id: string }>;
 };
 
-const NoteDetails = async ({ params }: Props) => {
+const NoteDetails = async ({ params }: NoteDetailsProps) => {
   const { id } = await params;
   const queryClient = new QueryClient();
 

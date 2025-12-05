@@ -1,18 +1,30 @@
 import css from './Modal.module.css';
 import { createPortal } from 'react-dom';
 import React, { useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface ModalProps {
   children: React.ReactNode;
-  onClose: () => void;
+  onClose?: () => void;
 }
 
 export default function Modal({ children, onClose }: ModalProps) {
+  const router = useRouter();
+
   const handleEsc = useCallback(
     (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      const isSure = confirm('Are you sure?');
+      if (isSure) {
+        if (e.key === 'Escape') {
+          if (onClose) {
+            onClose();
+          } else {
+            router.back();
+          }
+        }
+      }
     },
-    [onClose]
+    [onClose, router]
   );
 
   useEffect(() => {
@@ -31,7 +43,16 @@ export default function Modal({ children, onClose }: ModalProps) {
   }, []);
 
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (e.target === e.currentTarget) onClose();
+    const isSure = confirm('Are you sure?');
+    if (isSure) {
+      if (e.target === e.currentTarget) {
+        if (onClose) {
+          onClose();
+        } else {
+          router.back();
+        }
+      }
+    }
   };
 
   const modalRoot = document.getElementById('modal-root');
