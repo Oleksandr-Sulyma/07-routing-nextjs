@@ -1,48 +1,3 @@
-- ☁️ **Vercel Deployment**
-- 📦 **ESLint + Prettier**
-
----
-
-## 📂 Структура Проєкту
-
-Проєкт побудовано з використанням **App Router** з чітким розділенням на Серверні та Клієнтські
-компоненти.
-
-```bash
-/
-├── app/
-│   ├── layout.tsx             # Глобальний layout (Header, Footer, TanStackProvider)
-│   ├── loading.tsx            # Глобальний UI завантаження для SSR
-│   ├── page.tsx               # Головна сторінка (/)
-│   └── notes/                 # Маршрут: /notes
-│       ├── error.tsx          # Error Boundary для помилок SSR/рендерингу
-│       ├── Notes.client.tsx   # Клієнтська логіка: useQuery, пошук, пагінація
-│       ├── page.tsx           # Серверний компонент: prefetchQuery (SSR)
-│       └── [id]/              # Динамічний маршрут: /notes/[id]
-│           ├── error.tsx      # Error Boundary для деталей нотатки
-│           ├── NoteDetails.client.tsx # Клієнтська логіка: useQuery, useParams
-│           └── page.tsx       # Серверний компонент: prefetchQuery(id)
-├── components/                # Багаторазові компоненти
-│   ├── Header/
-│   ├── Footer/
-│   ├── TanStackProvider/      # Провайдер для React Query
-│   └── ... (NoteList, NoteForm, SearchBox та ін.)
-├── hooks/                     # Кастомні хуки
-│   └── useModalControl.ts
-├── lib/                       # Службові функції
-│   └── api.ts                 # Усі функції роботи з API (fetchNotes, fetchNoteById, CRUD)
-├── types/                     # Глобальні типи
-│   └── note.ts                # Інтерфейси Note, NoteFormValues та ін.
-└── public/
-```
-
-Ви абсолютно праві! Я надав вам текст для README.md у двох окремих повідомленнях, що ускладнює його
-копіювання. Прошу вибачення за незручності.
-
-Ось повний вміст файлу README.md, об'єднаний та оформлений як єдиний Markdown документ. Ви можете
-просто скопіювати весь цей текст і зберегти його як файл README.md у корені вашого репозиторію.
-
-📝 README.md (Повний вміст) Markdown
 
 # 📝 NoteHub (Next.js версія)
 
@@ -56,8 +11,8 @@
 
 ## 🚀 Демо
 
-🔗 **Live Demo:** `https://06-notehub-nextjs-pt6tdtv61-3280673s-projects.vercel.app` 🔗 **GitHub
-Репозиторій:** `https://github.com/Oleksandr-Sulyma/06-notehub-nextjs`
+🔗 **Live Demo:** `https://07-routing-nextjs-hxcpef4nc-3280673s-projects.vercel.app/notes/filter/all` 🔗 **GitHub
+Репозиторій:** `https://github.com/Oleksandr-Sulyma/07-routing-nextjs`
 
 ---
 
