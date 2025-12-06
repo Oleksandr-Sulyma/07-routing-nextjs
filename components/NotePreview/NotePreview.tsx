@@ -26,6 +26,15 @@ const NotePreview = () => {
 
   const handleBack = () => router.back();
 
+  const formatDate = (date: string) =>
+    new Date(date).toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+
   let content;
 
   if (!id) {
@@ -36,8 +45,8 @@ const NotePreview = () => {
     content = <p>Something went wrong.</p>;
   } else {
     const formattedDate = note.updatedAt
-      ? `Updated at: ${note.updatedAt}`
-      : `Created at: ${note.createdAt}`;
+      ? `Updated: ${formatDate(note.updatedAt)}`
+      : `Created: ${formatDate(note.createdAt)}`;
 
     content = (
       <div className={css.item}>
