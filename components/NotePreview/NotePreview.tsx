@@ -24,12 +24,7 @@ const NotePreview = () => {
     enabled: !!id,
   });
 
-  const handleBack = () => {
-    const isSure = confirm('Are you sure?');
-    if (isSure) {
-      router.back();
-    }
-  };
+  const handleBack = () => router.back();
 
   let content;
 
