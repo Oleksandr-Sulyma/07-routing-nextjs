@@ -1,19 +1,14 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { fetchNoteById } from '@/lib/api';
 import css from './NotePreview.module.css';
 
 import type { Note } from '@/types/note';
 
-const NotePreview = () => {
+const NotePreview = ({ onClose }: { onClose: () => void }) => {
   const { id } = useParams<{ id: string }>();
-  const router = useRouter();
-  const handleBack = () => {
-    const isSure = confirm('Are you sure?');
-    if (isSure) router.back();
-  };
 
   const {
     data: note,
@@ -64,7 +59,7 @@ const NotePreview = () => {
   return (
     <div className={css.container}>
       {content}
-      <button type="button" className={css.backBtn} onClick={handleBack}>
+      <button type="button" className={css.backBtn} onClick={onClose}>
         Back
       </button>
     </div>

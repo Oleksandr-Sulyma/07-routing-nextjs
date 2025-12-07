@@ -14,10 +14,7 @@ export default async function NotesPage({ params }: Props) {
 
   const { slug } = await params;
 
-  const tagValue: NoteTag | undefined = 
-  slug[0] === 'all' 
-    ? undefined 
-    : (slug[0] as NoteTag);
+  const tagValue: NoteTag | undefined = slug[0] === 'All' ? undefined : (slug[0] as NoteTag);
 
   const apiParams: FetchNotesParams = {
     search: '',

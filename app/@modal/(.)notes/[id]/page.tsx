@@ -1,4 +1,4 @@
-import ModalCloser from './ModalCloser.client';
+import Modal from '@/components/Modal/Modal';
 import NotePreview from '@/app/@modal/(.)notes/[id]/NotePreview.client';
 import { fetchNoteById } from '@/lib/api';
 import { HydrationBoundary, QueryClient, dehydrate } from '@tanstack/react-query';
@@ -19,10 +19,10 @@ const PreviewNote = async ({ params }: PreviewNoteProps) => {
   const dehydratedState = dehydrate(queryClient);
 
   return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <ModalCloser>
-        <NotePreview />
-      </ModalCloser>
+    <HydrationBoundary state={dehydratedState}>
+      <Modal>
+        <NotePreview onClose={() => {}} />
+      </Modal>
     </HydrationBoundary>
   );
 };

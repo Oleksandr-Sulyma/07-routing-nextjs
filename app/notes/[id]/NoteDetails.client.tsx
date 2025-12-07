@@ -22,7 +22,7 @@ const NoteDetailsClient = () => {
     enabled: !!id,
   });
 
- const formatDate = (date: string) =>
+  const formatDate = (date: string) =>
     new Date(date).toLocaleString('en-US', {
       year: 'numeric',
       month: 'long',
