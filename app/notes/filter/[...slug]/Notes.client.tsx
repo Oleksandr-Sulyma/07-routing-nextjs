@@ -1,7 +1,96 @@
+// 'use client';
+
+// import css from './NotesPage.module.css';
+// import { useState } from 'react';
+// import { useDebouncedCallback } from 'use-debounce';
+// import { useQuery, keepPreviousData } from '@tanstack/react-query';
+// import { Toaster } from 'react-hot-toast';
+
+// import SearchBox from '@/components/SearchBox/SearchBox';
+// import Pagination from '@/components/Pagination/Pagination';
+// import NoteList from '@/components/NoteList/NoteList';
+// import Modal from '@/components/Modal/Modal';
+// import NoteForm from '@/components/NoteForm/NoteForm';
+// import NoNotesMessage from '@/components/NoNotesMessage/NoNotesMessage';
+
+// import { fetchNotes } from '@/lib/api';
+// import type { FetchNotesParams, FetchNotesResponse } from '@/lib/api';
+// import useModalControl from '@/hooks/useModalControl';
+
+// interface NotesClientProps {
+//   initialParams: FetchNotesParams;
+// }
+
+// function NotesClient({ initialParams }: NotesClientProps) {
+//   const createNoteModal = useModalControl();
+
+//   const [params, setParams] = useState<FetchNotesParams>(initialParams);
+
+//   const { data, isLoading, isError, isFetching } = useQuery<FetchNotesResponse, Error>({
+//     queryKey: ['notes', params.search, params.sortBy, params.page, params.tag],
+//     queryFn: () => fetchNotes(params),
+//     placeholderData: keepPreviousData,
+//     staleTime: 1000 * 60 * 5,
+//   });
+
+//   const debounceSearch = useDebouncedCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+//     setParams(prev => ({ ...prev, search: event.target.value, page: 1 }));
+//   }, 300);
+
+//   const handlePageChange = (page: number) => {
+//     setParams(prev => ({ ...prev, page }));
+//   };
+
+//   let content;
+
+//   if (isLoading) {
+//     content = <p>Loading, please wait...</p>;
+//   } else if (isError) {
+//     content = <p>Something went wrong.</p>;
+//   } else if (data && data.notes.length === 0) {
+//     content = <NoNotesMessage isSearch={params.search.length > 0} />;
+//   } else if (data) {
+//     content = <NoteList notes={data.notes} />;
+//   }
+
+//   return (
+//     <div className={css.app}>
+//       <Toaster />
+
+//       <header className={css.toolbar}>
+//         <SearchBox search={params.search} onChange={debounceSearch} />
+
+//         {isFetching && <p className={css.fetchingIndicator}>Updating...</p>}
+
+//         {data?.totalPages && data.totalPages > 1 && (
+//           <Pagination
+//             currentPage={params.page}
+//             totalPages={data.totalPages}
+//             onPageChange={handlePageChange}
+//           />
+//         )}
+
+//         <button className={css.button} onClick={createNoteModal.openModal}>
+//           Create note +
+//         </button>
+//       </header>
+
+//       <div className={css.listContainer}>{content}</div>
+
+//       {createNoteModal.isModalOpen && (
+//         <Modal onClose={createNoteModal.closeModal}>
+//           <NoteForm onClose={createNoteModal.closeModal} />
+//         </Modal>
+//       )}
+//     </div>
+//   );
+// }
+
+// export default NotesClient;
 'use client';
 
 import css from './NotesPage.module.css';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
@@ -17,28 +106,44 @@ import { fetchNotes } from '@/lib/api';
 import type { FetchNotesParams, FetchNotesResponse } from '@/lib/api';
 import useModalControl from '@/hooks/useModalControl';
 
+import type { NoteTag } from '@/types/note'
 interface NotesClientProps {
-  initialParams: FetchNotesParams;
+  tag?: NoteTag | undefined;
 }
 
-function NotesClient({ initialParams }: NotesClientProps) {
+interface ClientParamsState {
+    search: string;
+    page: number;
+    sortBy: 'created' | 'updated';
+}
+
+function NotesClient({ tag }: NotesClientProps) {
   const createNoteModal = useModalControl();
 
-  const [params, setParams] = useState<FetchNotesParams>(initialParams);
+  const [clientParams, setClientParams] = useState<ClientParamsState>(() => ({
+    search: '', 
+    page: 1,
+    sortBy: 'created' as const, 
+  }));
+
+  const finalParams: FetchNotesParams = {
+      ...clientParams,
+      tag: tag,
+  };
 
   const { data, isLoading, isError, isFetching } = useQuery<FetchNotesResponse, Error>({
-    queryKey: ['notes', params.search, params.sortBy, params.page, params.tag],
-    queryFn: () => fetchNotes(params),
+    queryKey: ['notes', finalParams.search, finalParams.sortBy, finalParams.page, finalParams.tag],
+    queryFn: () => fetchNotes(finalParams),
     placeholderData: keepPreviousData,
-    staleTime: 1000 * 60 * 5,
+    staleTime: Infinity,
   });
 
-  const debounceSearch = useDebouncedCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    setParams(prev => ({ ...prev, search: event.target.value, page: 1 }));
+  const debounceSearch = useDebouncedCallback((value:string) => {
+    setClientParams(prev => ({ ...prev, search: value, page: 1 }));
   }, 300);
 
   const handlePageChange = (page: number) => {
-    setParams(prev => ({ ...prev, page }));
+    setClientParams(prev => ({ ...prev, page }));
   };
 
   let content;
@@ -48,7 +153,7 @@ function NotesClient({ initialParams }: NotesClientProps) {
   } else if (isError) {
     content = <p>Something went wrong.</p>;
   } else if (data && data.notes.length === 0) {
-    content = <NoNotesMessage isSearch={params.search.length > 0} />;
+    content = <NoNotesMessage isSearch={clientParams.search.length > 0} />;
   } else if (data) {
     content = <NoteList notes={data.notes} />;
   }
@@ -58,13 +163,13 @@ function NotesClient({ initialParams }: NotesClientProps) {
       <Toaster />
 
       <header className={css.toolbar}>
-        <SearchBox search={params.search} onChange={debounceSearch} />
+        <SearchBox search={clientParams.search} onChange={debounceSearch} />
 
         {isFetching && <p className={css.fetchingIndicator}>Updating...</p>}
 
         {data?.totalPages && data.totalPages > 1 && (
           <Pagination
-            currentPage={params.page}
+            currentPage={clientParams.page}
             totalPages={data.totalPages}
             onPageChange={handlePageChange}
           />

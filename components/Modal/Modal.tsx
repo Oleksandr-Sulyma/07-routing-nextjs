@@ -13,9 +13,9 @@ export default function Modal({ children, onClose }: ModalProps) {
 
   const handleEsc = useCallback(
     (e: KeyboardEvent) => {
-      const isSure = confirm('Are you sure?');
-      if (isSure) {
-        if (e.key === 'Escape') {
+      if (e.key === 'Escape') {
+        const isSure = confirm('Are you sure?');
+        if (isSure) {
           if (onClose) {
             onClose();
           } else {
@@ -43,13 +43,15 @@ export default function Modal({ children, onClose }: ModalProps) {
   }, []);
 
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    const isSure = confirm('Are you sure?');
-    if (isSure) {
-      if (e.target === e.currentTarget) {
-        if (onClose) {
-          onClose();
-        } else {
-          router.back();
+    if (e.target === e.currentTarget) {
+      const isSure = confirm('Are you sure?');
+      if (isSure) {
+        if (e.target === e.currentTarget) {
+          if (onClose) {
+            onClose();
+          } else {
+            router.back();
+          }
         }
       }
     }
@@ -60,7 +62,9 @@ export default function Modal({ children, onClose }: ModalProps) {
 
   return createPortal(
     <div className={css.backdrop} role="dialog" aria-modal="true" onClick={handleBackdropClick}>
-      <div className={css.modal}>{children}</div>
+      <div className={css.modal} onClick={e => e.stopPropagation()}>
+        {children}
+      </div>
     </div>,
     modalRoot
   );

@@ -3,6 +3,8 @@ import { fetchNotes } from '@/lib/api';
 import NotesClient from './Notes.client';
 import type { FetchNotesParams } from '@/lib/api';
 
+import { NoteTag } from '@/types/note';
+
 type Props = {
   params: Promise<{ slug: string[] }>;
 };
@@ -12,11 +14,16 @@ export default async function NotesPage({ params }: Props) {
 
   const { slug } = await params;
 
+  const tagValue: NoteTag | undefined = 
+  slug[0] === 'all' 
+    ? undefined 
+    : (slug[0] as NoteTag);
+
   const apiParams: FetchNotesParams = {
     search: '',
     page: 1,
     sortBy: 'created' as const,
-    tag: slug[0] === 'all' ? undefined : slug[0],
+    tag: tagValue,
   };
 
   await queryClient.prefetchQuery({
@@ -28,7 +35,7 @@ export default async function NotesPage({ params }: Props) {
 
   return (
     <HydrationBoundary state={dehydratedState}>
-      <NotesClient initialParams={apiParams} />
+      <NotesClient tag={tagValue} />
     </HydrationBoundary>
   );
 }

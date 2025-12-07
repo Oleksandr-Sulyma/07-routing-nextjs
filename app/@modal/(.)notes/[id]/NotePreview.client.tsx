@@ -10,6 +10,10 @@ import type { Note } from '@/types/note';
 const NotePreview = () => {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
+  const handleBack = () => {
+    const isSure = confirm('Are you sure?');
+    if (isSure) router.back();
+  };
 
   const {
     data: note,
@@ -20,11 +24,9 @@ const NotePreview = () => {
     queryKey: ['note', id],
     queryFn: () => fetchNoteById(id),
     refetchOnMount: false,
-    staleTime: 1000 * 60 * 5,
+    staleTime: Infinity,
     enabled: !!id,
   });
-
-  const handleBack = () => router.back();
 
   const formatDate = (date: string) =>
     new Date(date).toLocaleString('en-US', {

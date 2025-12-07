@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Note, NoteFormValues } from '@/types/note';
+import { Note, NoteFormValues, NoteTag  } from '@/types/note';
 
 const NOTEHUB_TOKEN = process.env.NEXT_PUBLIC_NOTEHUB_TOKEN;
 
@@ -10,7 +10,7 @@ export interface FetchNotesParams {
   search: string;
   page: number;
   sortBy: 'created' | 'updated';
-  tag?: string;
+  tag?: NoteTag;
 }
 
 export interface FetchNotesResponse {
@@ -31,7 +31,7 @@ export const fetchNotes = async ({
     sortBy,
   };
 
-  if (tag && tag !== 'all') {
+  if (tag && tag !== 'All') {
     params.tag = tag;
   }
 
