@@ -31,7 +31,7 @@ export const fetchNotes = async ({
     sortBy,
   };
 
-  if (tag && tag !== 'All') {
+  if (tag && tag !== 'all') {
     params.tag = tag;
   }
 

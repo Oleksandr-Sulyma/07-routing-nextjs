@@ -8,9 +8,9 @@ const NotesSidebar = () => {
   return (
     <div>
       <ul className={css.menuList}>
-        <li key="All" className={css.menuItem}>
-          <Link href={`/notes/filter/All`} className={css.menuLink}>
-            All notes
+        <li key="all" className={css.menuItem}>
+          <Link href={`/notes/filter/all`} className={css.menuLink}>
+            all notes
           </Link>
         </li>
         {tags.map(tag => (

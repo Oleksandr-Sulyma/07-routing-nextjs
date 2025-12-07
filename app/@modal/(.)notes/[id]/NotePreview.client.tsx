@@ -1,7 +1,8 @@
 'use client';
 
+import Modal from '@/components/Modal/Modal';
 import { useQuery } from '@tanstack/react-query';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { fetchNoteById } from '@/lib/api';
 import css from './NotePreview.module.css';
 
@@ -13,6 +14,7 @@ interface NotePreviewProps {
 
 const NotePreview = ({ onClose }: NotePreviewProps) => {
   const { id } = useParams<{ id: string }>();
+  const router = useRouter();
 
   const {
     data: note,
@@ -25,6 +27,8 @@ const NotePreview = ({ onClose }: NotePreviewProps) => {
     staleTime: Infinity,
     enabled: !!id,
   });
+
+  const handleClose = () => router.back();
 
   const formatDate = (date: string) =>
     new Date(date).toLocaleString('en-US', {
@@ -52,6 +56,7 @@ const NotePreview = ({ onClose }: NotePreviewProps) => {
       <div className={css.item}>
         <div className={css.header}>
           <h2>{note.title}</h2>
+          <p className={css.tag}>{note.tag}</p>
         </div>
         <p className={css.content}>{note.content}</p>
         <p className={css.date}>{formattedDate}</p>
@@ -60,12 +65,14 @@ const NotePreview = ({ onClose }: NotePreviewProps) => {
   }
 
   return (
-    <div className={css.container}>
-      {content}
-      <button type="button" className={css.backBtn} onClick={onClose}>
-        Back
-      </button>
-    </div>
+    <Modal onClose={handleClose}>
+      <div className={css.container}>
+        {content}
+        <button type="button" className={css.backBtn} onClick={handleClose}>
+          Back
+        </button>
+      </div>
+    </Modal>
   );
 };
 
