@@ -2,6 +2,7 @@ import Modal from '@/components/Modal/Modal';
 import NotePreview from '@/app/@modal/(.)notes/[id]/NotePreview.client';
 import { fetchNoteById } from '@/lib/api';
 import { HydrationBoundary, QueryClient, dehydrate } from '@tanstack/react-query';
+import React from 'react';
 
 type PreviewNoteProps = {
   params: Promise<{ id: string }>;
@@ -9,6 +10,7 @@ type PreviewNoteProps = {
 
 const PreviewNote = async ({ params }: PreviewNoteProps) => {
   const { id } = await params;
+
   const queryClient = new QueryClient();
 
   await queryClient.prefetchQuery({
@@ -18,10 +20,12 @@ const PreviewNote = async ({ params }: PreviewNoteProps) => {
 
   const dehydratedState = dehydrate(queryClient);
 
+  const NotePreviewAsElement = NotePreview as React.ComponentType<object>;
+
   return (
     <HydrationBoundary state={dehydratedState}>
       <Modal>
-        <NotePreview onClose={() => {}} />
+        <NotePreviewAsElement />
       </Modal>
     </HydrationBoundary>
   );

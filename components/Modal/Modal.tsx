@@ -2,32 +2,50 @@
 
 import css from './Modal.module.css';
 import { createPortal } from 'react-dom';
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 
-interface ModalProps {
-  children: React.ReactNode;
+interface ModalProps<T extends object = Record<string, never>> {
+  children: React.ReactElement<T>;
   onClose?: () => void;
 }
 
-export default function Modal({ children, onClose }: ModalProps) {
+export default function Modal<T extends object = Record<string, never>>({
+  children,
+  onClose,
+}: ModalProps<T>) {
   const router = useRouter();
+
+  const finalCloseHandler = useMemo(
+    () => (onClose ? onClose : () => router.back()),
+    [onClose, router]
+  );
+
+  const handleCloseAttempt = useCallback(() => {
+    const isSure = confirm('Are you sure?');
+    if (isSure) {
+      finalCloseHandler();
+    }
+  }, [finalCloseHandler]);
 
   const handleEsc = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        const isSure = confirm('Are you sure?');
-        if (isSure) {
-          if (onClose) {
-            onClose();
-          } else {
-            router.back();
-          }
-        }
+        handleCloseAttempt();
       }
     },
-    [onClose, router]
+    [handleCloseAttempt]
   );
+
+  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === e.currentTarget) {
+      handleCloseAttempt();
+    }
+  };
+
+  const childWithCloseProp = React.cloneElement(children, {
+    onClose: handleCloseAttempt,
+  } as T);
 
   useEffect(() => {
     document.addEventListener('keydown', handleEsc);
@@ -44,28 +62,13 @@ export default function Modal({ children, onClose }: ModalProps) {
     };
   }, []);
 
-  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (e.target === e.currentTarget) {
-      const isSure = confirm('Are you sure?');
-      if (isSure) {
-        if (e.target === e.currentTarget) {
-          if (onClose) {
-            onClose();
-          } else {
-            router.back();
-          }
-        }
-      }
-    }
-  };
-
   const modalRoot = document.getElementById('modal-root');
   if (!modalRoot) return null;
 
   return createPortal(
     <div className={css.backdrop} role="dialog" aria-modal="true" onClick={handleBackdropClick}>
       <div className={css.modal} onClick={e => e.stopPropagation()}>
-        {children}
+        {childWithCloseProp}
       </div>
     </div>,
     modalRoot

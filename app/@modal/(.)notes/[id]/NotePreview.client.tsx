@@ -7,13 +7,16 @@ import css from './NotePreview.module.css';
 
 import type { Note } from '@/types/note';
 
-const NotePreview = ({ onClose }: { onClose: () => void }) => {
+interface NotePreviewProps {
+  onClose: () => void;
+}
+
+const NotePreview = ({ onClose }: NotePreviewProps) => {
   const { id } = useParams<{ id: string }>();
 
   const {
     data: note,
     isLoading,
-    isFetching,
     error,
   } = useQuery<Note, Error>({
     queryKey: ['note', id],
@@ -36,7 +39,7 @@ const NotePreview = ({ onClose }: { onClose: () => void }) => {
 
   if (!id) {
     content = <p>Error: Note ID is missing from the URL.</p>;
-  } else if (isLoading || isFetching) {
+  } else if (isLoading) {
     content = <p>Loading, please wait...</p>;
   } else if (error || !note) {
     content = <p>Something went wrong.</p>;
