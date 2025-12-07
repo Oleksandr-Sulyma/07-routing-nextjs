@@ -8,8 +8,8 @@ const NotesSidebar = () => {
   return (
     <div>
       <ul className={css.menuList}>
-        <li key="all" className={css.menuItem}>
-          <Link href={`/notes/filter/all`} className={css.menuLink}>
+        <li key="All" className={css.menuItem}>
+          <Link href={`/notes/filter/All`} className={css.menuLink}>
             All notes
           </Link>
         </li>
